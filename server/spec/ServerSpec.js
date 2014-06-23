@@ -109,6 +109,8 @@ it('Should respond with messages that were previously posted', function() {
 
     handler.handler(req, res);
 
+    // expect(res._responseCode).to.equal(404);
+
     // Wait for response to return and then check status code
     waitForThen(
       function() { return res._ended; },

@@ -11,8 +11,52 @@ var handleRequest = function(request, response) {
 
   /* Documentation for both request and response can be found at
    * http://nodemanual.org/0.8.14/nodejs_ref_guide/http.html */
-
+  console.log('request is ', request);
   console.log("Serving request type " + request.method + " for url " + request.url);
+
+  var handleMethod = {POST: handlePost,
+                    GET: handleGet};
+
+  handleMethod[request.method](request,response);
+
+};
+
+
+
+/* These headers will allow Cross-Origin Resource Sharing (CORS).
+ * This CRUCIAL code allows this server to talk to websites that
+ * are on different domains. (Your chat client is running from a url
+ * like file://your/chat/client/index.html, which is considered a
+ * different domain.) */
+var defaultCorsHeaders = {
+  "access-control-allow-origin": "*",
+  "access-control-allow-methods": "GET, POST, PUT, DELETE, OPTIONS",
+  "access-control-allow-headers": "content-type, accept",
+  "access-control-max-age": 10 // Seconds.
+};
+
+var handlePost = function(request,response){
+
+  var statusCode = 201;
+
+  /* Without this line, this server wouldn't work. See the note
+   * below about CORS. */
+  var headers = defaultCorsHeaders;
+
+  headers['Content-Type'] = "text/plain";
+
+  /* .writeHead() tells our server what HTTP status code to send back */
+  response.writeHead(statusCode, headers);
+
+  /* Make sure to always call response.end() - Node will not send
+   * anything back to the client until you do. The string you pass to
+   * response.end() will be the body of the response - i.e. what shows
+   * up in the browser.*/
+  response.end(JSON.stringify(''));
+
+};
+
+var handleGet = function(request, response){
 
   var statusCode = 200;
 
@@ -29,17 +73,12 @@ var handleRequest = function(request, response) {
    * anything back to the client until you do. The string you pass to
    * response.end() will be the body of the response - i.e. what shows
    * up in the browser.*/
-  response.end("Hello, World!");
+  response.end(JSON.stringify({hello: "Hello, World!",
+                              results: [{ username: 'Jono',
+                                          message: 'Do my bidding!'
+                                        }] }));
+
 };
 
-/* These headers will allow Cross-Origin Resource Sharing (CORS).
- * This CRUCIAL code allows this server to talk to websites that
- * are on different domains. (Your chat client is running from a url
- * like file://your/chat/client/index.html, which is considered a
- * different domain.) */
-var defaultCorsHeaders = {
-  "access-control-allow-origin": "*",
-  "access-control-allow-methods": "GET, POST, PUT, DELETE, OPTIONS",
-  "access-control-allow-headers": "content-type, accept",
-  "access-control-max-age": 10 // Seconds.
-};
+
+module.exports = {handler: handleRequest};

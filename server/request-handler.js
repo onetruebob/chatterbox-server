@@ -1,3 +1,5 @@
+var messages = require('./messages.js');
+
 /* You should implement your request handler function in this file.
  * And hey! This is already getting passed to http.createServer()
  * in basic-server.js. But it won't work as is.
@@ -11,7 +13,7 @@ var handleRequest = function(request, response) {
 
   /* Documentation for both request and response can be found at
    * http://nodemanual.org/0.8.14/nodejs_ref_guide/http.html */
-  console.log('request is ', request);
+  //console.log('request is ', request);
   console.log("Serving request type " + request.method + " for url " + request.url);
 
   var headers = defaultCorsHeaders;
@@ -22,7 +24,11 @@ var handleRequest = function(request, response) {
   //and are tied to the appropriate functions
   var handleMethod = {"/classes/room1": {POST: handlePost,
                                          OPTIONS: handleOptions,
-                                         GET: handleGet}};
+                                         GET: handleGet},
+                      "/classes/messages": {POST: handlePost,
+                                            OPTIONS: handleOptions,
+                                            GET: handleGet}
+                     };
 
 
   //now just invoke the function at the correct key.  wammo
@@ -78,22 +84,27 @@ var handle404 = function(response){
 
 var handlePost = function(request,response){
 
+  var postData = '';
   var statusCode = 201;
 
-  /* Without this line, this server wouldn't work. See the note
-   * below about CORS. */
   var headers = defaultCorsHeaders;
 
   headers['Content-Type'] = "text/plain";
 
-  /* .writeHead() tells our server what HTTP status code to send back */
-  response.writeHead(statusCode, headers);
+  request.on("data",function(chunk){
+    postData += chunk;
+  });
 
-  /* Make sure to always call response.end() - Node will not send
-   * anything back to the client until you do. The string you pass to
-   * response.end() will be the body of the response - i.e. what shows
-   * up in the browser.*/
-  response.end(JSON.stringify(''));
+  request.on("end", function(){
+    var message = JSON.parse(postData);
+    if(messages.validateMessage(message)){
+      messages.createMessage(message);
+    } else {
+      statusCode = 400;
+    }
+    response.writeHead(statusCode, headers);
+    response.end();
+  });
 
 };
 
@@ -126,7 +137,7 @@ var handleGet = function(request, response){
    * below about CORS. */
   var headers = defaultCorsHeaders;
 
-  headers['Content-Type'] = "text/plain";
+  headers['Content-Type'] = "application/json";
 
   /* .writeHead() tells our server what HTTP status code to send back */
   response.writeHead(statusCode, headers);
@@ -135,10 +146,7 @@ var handleGet = function(request, response){
    * anything back to the client until you do. The string you pass to
    * response.end() will be the body of the response - i.e. what shows
    * up in the browser.*/
-  response.end(JSON.stringify({hello: "Hello, World!",
-                              results: [{ username: 'Jono',
-                                          message: 'Do my bidding!'
-                                        }] }));
+  response.end(JSON.stringify(messages.getMessages()));
 
 };
 

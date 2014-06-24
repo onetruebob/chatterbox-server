@@ -14,10 +14,23 @@ var handleRequest = function(request, response) {
   console.log('request is ', request);
   console.log("Serving request type " + request.method + " for url " + request.url);
 
-  var handleMethod = {POST: handlePost,
-                    GET: handleGet};
+  var headers = defaultCorsHeaders;
+  var baseURL = request.url.split('?')[0];
 
-  handleMethod[request.method](request,response);
+  //cool move
+  //create object keys that actually match the request methods
+  //and are tied to the appropriate functions
+  var handleMethod = {"/classes/room1": {POST: handlePost,
+                                         OPTIONS: handleOptions,
+                                         GET: handleGet}};
+
+
+  //now just invoke the function at the correct key.  wammo
+  if (handleMethod[baseURL]){
+    handleMethod[baseURL][request.method](request,response);
+  } else {
+    handle404(response);
+  }
 
 };
 
@@ -29,11 +42,37 @@ var handleRequest = function(request, response) {
  * like file://your/chat/client/index.html, which is considered a
  * different domain.) */
 var defaultCorsHeaders = {
-  "access-control-allow-origin": "*",
-  "access-control-allow-methods": "GET, POST, PUT, DELETE, OPTIONS",
-  "access-control-allow-headers": "content-type, accept",
-  "access-control-max-age": 10 // Seconds.
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+  "Access-Control-Allow-Credentials": "true",
+  "Access-Control-Allow-Headers": "X-Requested-With, Access-Control-Allow-Origin, X-HTTP-Method-Override, Content-Type, Authorization, Accept, x-parse-application-id, x-parse-rest-api-key",
+  "Access-Control-Max-Age": 10 // Seconds.
 };
+//orig "content-type, accept"
+//"X-Requested-With, Access-Control-Allow-Origin, X-HTTP-Method-Override, Content-Type, Authorization, Accept"
+
+var handle404 = function(response){
+
+  var statusCode = 404;
+
+  /* Without this line, this server wouldn't work. See the note
+   * below about CORS. */
+  var headers = defaultCorsHeaders;
+
+  headers['Content-Type'] = "text/plain";
+
+  /* .writeHead() tells our server what HTTP status code to send back */
+  response.writeHead(statusCode, headers);
+
+  /* Make sure to always call response.end() - Node will not send
+   * anything back to the client until you do. The string you pass to
+   * response.end() will be the body of the response - i.e. what shows
+   * up in the browser.*/
+  response.end(JSON.stringify('URL not found...'));
+
+
+};
+
 
 var handlePost = function(request,response){
 
@@ -53,6 +92,27 @@ var handlePost = function(request,response){
    * response.end() will be the body of the response - i.e. what shows
    * up in the browser.*/
   response.end(JSON.stringify(''));
+
+};
+
+var handleOptions = function(request, response){
+
+  var statusCode = 200;
+
+  /* Without this line, this server wouldn't work. See the note
+   * below about CORS. */
+  var headers = defaultCorsHeaders;
+
+  headers['Content-Type'] = "text/plain";
+
+  /* .writeHead() tells our server what HTTP status code to send back */
+  response.writeHead(statusCode, headers);
+
+  /* Make sure to always call response.end() - Node will not send
+   * anything back to the client until you do. The string you pass to
+   * response.end() will be the body of the response - i.e. what shows
+   * up in the browser.*/
+  response.end();
 
 };
 

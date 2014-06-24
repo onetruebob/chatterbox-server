@@ -45,7 +45,9 @@ var defaultCorsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
   "Access-Control-Allow-Credentials": "true",
-  "Access-Control-Allow-Headers": "X-Requested-With, Access-Control-Allow-Origin, X-HTTP-Method-Override, Content-Type, Authorization, Accept, x-parse-application-id, x-parse-rest-api-key",
+  // needed for authentication code to work with Parse. Not needed for this version of the app.
+  // "Access-Control-Allow-Headers": "X-Requested-With, Access-Control-Allow-Origin, X-HTTP-Method-Override, Content-Type, Authorization, Accept, x-parse-application-id, x-parse-rest-api-key",
+  "Access-Control-Allow-Headers":  "Content-Type, Accept",
   "Access-Control-Max-Age": 10 // Seconds.
 };
 //orig "content-type, accept"

@@ -1,4 +1,7 @@
 // System for storying messages
+var fileHelper = require('./fileHelper.js');
+
+var initialized = false;
 
 var msgStorage = {};
 
@@ -13,6 +16,9 @@ var createMessage = function (msgObj) {
   //insert into our message stor
   msgStorage[msgObj.objectId] = msgObj;
   console.log('message storage ', msgStorage);
+
+  //Request to save the message store
+  fileHelper.saveData('messages', msgStorage);
 };
 
 var validateMessage = function (msgObj) {
@@ -29,12 +35,21 @@ var validateMessage = function (msgObj) {
 var getMessages = function (){
   var result = [];
 
+  if(fileHelper.checkFileStatus) {
+    msgStorage = fileHelper.getFileData();
+    nextObjId = Object.keys(msgStorage).length;
+  }
+
   for(var message in msgStorage) {
     result.push(msgStorage[message]);
   }
 
   return {'results': result};
 };
+
+//Tell the file helper to get the file so
+//hopefully it's here before the client makes it's first request
+fileHelper.startFileRead('messages');
 
 module.exports = {};
 module.exports.createMessage = createMessage;

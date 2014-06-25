@@ -1,0 +1,24 @@
+{
+  "name": "Chatterbox Client",
+  "version": "0.0.0",
+  "homepage": "none",
+  "authors": [
+    "Bob Owen <bob@bobowen.org>"
+  ],
+  "description": "Client for Chatterbox",
+  "moduleType": [
+    "amd"
+  ],
+  "license": "None",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "~2.1.1",
+    "underscore": "~1.6.0"
+  }
+}

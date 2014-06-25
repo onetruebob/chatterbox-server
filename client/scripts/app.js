@@ -4,7 +4,7 @@
 // parkpigz' onmouseover='alert("pownage!")   Breaks ours from the user form
 
 var app = {
-  server: 'http://127.0.0.1:3000/classes/room1',
+  server: 'http://onetruebob.azurewebsites.net/classes/room1',
   username: null,
   room: 'lobby',
   rooms: {},
